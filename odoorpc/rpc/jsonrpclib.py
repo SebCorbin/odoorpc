@@ -73,6 +73,7 @@ class ProxyJSON(Proxy):
     """
     def __init__(self, host, port, timeout=120, ssl=False, opener=None,
                  deserialize=True):
+        self.host = host
         Proxy.__init__(self, host, port, timeout, ssl, opener)
         self._deserialize = deserialize
 
@@ -87,6 +88,8 @@ class ProxyJSON(Proxy):
             url = url[1:]
         request = Request(url='/'.join([self._root_url, url]),
                           data=encode_data(data))
+        # When using custom port, host will contain port, hence force host
+        request.add_header('Host', self.host)
         request.add_header('Content-Type', 'application/json')
         response = self._opener.open(request, timeout=self._timeout)
         if not self._deserialize:
